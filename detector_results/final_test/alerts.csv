@@ -1,0 +1,5 @@
+packet,severity,src,dst,protocol,dport,description,payload
+1,HIGH,192.0.2.50,172.19.0.2,UDP,631,unexpected legacy-browse prefix; no printer URI found; source not in trusted-source allowlist,UNRECOGNISED-PRINTER-TEST-1
+2,HIGH,192.0.2.50,172.19.0.2,UDP,631,unexpected legacy-browse prefix; no printer URI found; source not in trusted-source allowlist,UNRECOGNISED-PRINTER-TEST-2
+3,HIGH,192.0.2.50,172.19.0.2,UDP,631,unexpected legacy-browse prefix; no printer URI found; source not in trusted-source allowlist,UNRECOGNISED-PRINTER-TEST-3
+,MEDIUM,192.0.2.50,,UDP,631,repeated UDP/631 traffic: 3 packets,

@@ -1,0 +1,12 @@
+[
+  {
+    "packet": 1,
+    "severity": "HIGH",
+    "src": "10.0.2.15",
+    "dst": "10.0.2.2",
+    "protocol": "UDP",
+    "dport": 631,
+    "description": "unexpected legacy-browse prefix; no printer URI found; source not in trusted-source allowlist",
+    "payload": "-CONNECTIVITY-TEST"
+  }
+]

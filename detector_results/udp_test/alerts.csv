@@ -1,0 +1,2 @@
+packet,severity,src,dst,protocol,dport,description,payload
+1,HIGH,10.0.2.15,10.0.2.2,UDP,631,unexpected legacy-browse prefix; no printer URI found; source not in trusted-source allowlist,-CONNECTIVITY-TEST

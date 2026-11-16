@@ -1,0 +1,42 @@
+[
+  {
+    "packet": 1,
+    "severity": "HIGH",
+    "src": "192.0.2.50",
+    "dst": "172.19.0.2",
+    "protocol": "UDP",
+    "dport": 631,
+    "description": "unexpected legacy-browse prefix; no printer URI found; source not in trusted-source allowlist",
+    "payload": "UNRECOGNISED-PRINTER-TEST-1"
+  },
+  {
+    "packet": 2,
+    "severity": "HIGH",
+    "src": "192.0.2.50",
+    "dst": "172.19.0.2",
+    "protocol": "UDP",
+    "dport": 631,
+    "description": "unexpected legacy-browse prefix; no printer URI found; source not in trusted-source allowlist",
+    "payload": "UNRECOGNISED-PRINTER-TEST-2"
+  },
+  {
+    "packet": 3,
+    "severity": "HIGH",
+    "src": "192.0.2.50",
+    "dst": "172.19.0.2",
+    "protocol": "UDP",
+    "dport": 631,
+    "description": "unexpected legacy-browse prefix; no printer URI found; source not in trusted-source allowlist",
+    "payload": "UNRECOGNISED-PRINTER-TEST-3"
+  },
+  {
+    "packet": "",
+    "severity": "MEDIUM",
+    "src": "192.0.2.50",
+    "dst": "",
+    "protocol": "UDP",
+    "dport": 631,
+    "description": "repeated UDP/631 traffic: 3 packets",
+    "payload": ""
+  }
+]
