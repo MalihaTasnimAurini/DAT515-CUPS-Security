@@ -1,183 +1,160 @@
 #!/usr/bin/env python3
 """
-CUPS Printer Discovery Detector
-Offline PCAP analysis using Scapy.
+cups_detector.py - CUPS printer-discovery traffic detector (DAT505)
+Offline PCAP analysis or live capture of suspicious UDP/631 (cups-browsed) activity.
+
+Rules:
+  R1 HIGH   UDP/631 from a source not in the trusted allowlist
+  R2 HIGH   UDP/631 payload that is not a valid legacy CUPS browse packet (malformed)
+  R3 MEDIUM Repeated UDP/631 from the same source (>= repeat-threshold)
+  R4 INFO   TCP/631 traffic (flagged for review)
+  R5 INFO   Recognised lab connectivity-test payload
+
+Isolated-lab use only.
 """
-
-from scapy.all import rdpcap, IP, UDP, TCP, Raw
-import argparse
-import csv
-import json
-import os
+import argparse, csv, json
+from collections import defaultdict
 from datetime import datetime
-from collections import Counter
+from scapy.all import rdpcap, sniff, IP, IPv6, TCP, UDP, Raw
+
+CUPS_PORT = 631
+LAB_TEST_MARKER = b"LAB-TEST"   # <-- change to match your harmless test payload, or remove R5
 
 
-def analyse_packets(packets, trusted_sources):
-    alerts = []
-    source_counts = Counter()
+def is_valid_browse(payload: bytes) -> bool:
+    """Legacy CUPS browse packet = '<type-hex> <state-hex> <uri> ...'"""
+    try:
+        text = payload.decode("ascii").strip()
+    except UnicodeDecodeError:
+        return False
+    parts = text.split(None, 2)
+    if len(parts) < 3:
+        return False
+    ptype, pstate, rest = parts
+    try:
+        int(ptype, 16); int(pstate, 16)
+    except ValueError:
+        return False
+    return rest.startswith(("ipp://", "ipps://", "http://", "https://"))
 
-    for packet in packets:
-        if not packet.haslayer(IP):
-            continue
 
-        src = packet[IP].src
-        dst = packet[IP].dst
+class Detector:
+    def __init__(self, trusted, port=CUPS_PORT, repeat_threshold=3):
+        self.trusted = set(trusted)
+        self.port = port
+        self.repeat_threshold = repeat_threshold
+        self.udp_counts = defaultdict(int)
+        self.alerts = []
+        self.total = 0
 
-        if packet.haslayer(UDP) and packet[UDP].dport == 631:
-            udp = packet[UDP]
-            payload = bytes(packet[Raw].load) if packet.haslayer(Raw) else b""
+    def _add(self, severity, rule, detail, src, dst, sport, dport, proto):
+        self.alerts.append({
+            "timestamp": datetime.now().isoformat(timespec="seconds"),
+            "severity": severity, "rule": rule, "proto": proto,
+            "src": src, "dst": dst, "sport": sport, "dport": dport,
+            "detail": detail,
+        })
 
-            source_counts[src] += 1
+    def inspect(self, pkt):
+        self.total += 1
+        if IP in pkt:
+            src, dst = pkt[IP].src, pkt[IP].dst
+        elif IPv6 in pkt:
+            src, dst = pkt[IPv6].src, pkt[IPv6].dst
+        else:
+            return
 
-            severity = "INFO"
-            message = "UDP traffic to CUPS port 631"
+        if UDP in pkt and pkt[UDP].dport == self.port:
+            sport, dport = pkt[UDP].sport, pkt[UDP].dport
+            payload = bytes(pkt[Raw].load) if Raw in pkt else b""
 
-            if payload == b"CUPS-LAB-UDP-CONNECTIVITY-TEST":
-                message = "Known laboratory connectivity test"
+            if LAB_TEST_MARKER in payload:
+                self._add("INFO", "R5-lab-test",
+                          "Recognised lab connectivity-test payload",
+                          src, dst, sport, dport, "UDP")
+                return
 
-            elif not payload:
-                severity = "MEDIUM"
-                message = "Empty UDP packet to CUPS port 631"
+            if src not in self.trusted:
+                self._add("HIGH", "R1-untrusted-source",
+                          f"UDP/{self.port} from untrusted source {src}",
+                          src, dst, sport, dport, "UDP")
 
-            elif b"ipp://" in payload.lower():
-                severity = "REVIEW"
-                message = "Possible printer advertisement"
+            if not is_valid_browse(payload):
+                self._add("HIGH", "R2-malformed",
+                          "Payload is not a valid legacy CUPS browse packet",
+                          src, dst, sport, dport, "UDP")
 
-            elif len(payload) < 10:
-                severity = "MEDIUM"
-                message = "Short or malformed UDP payload"
+            self.udp_counts[src] += 1
+            if self.udp_counts[src] == self.repeat_threshold:
+                self._add("MEDIUM", "R3-repeated",
+                          f"Repeated UDP/{self.port} from {src} (>= {self.repeat_threshold})",
+                          src, dst, sport, dport, "UDP")
 
-            else:
-                severity = "REVIEW"
-                message = "Unrecognised UDP payload on port 631"
+        elif TCP in pkt and pkt[TCP].dport == self.port:
+            self._add("INFO", "R4-tcp-review",
+                      f"TCP/{self.port} connection (review)",
+                      src, dst, pkt[TCP].sport, pkt[TCP].dport, "TCP")
 
-            if trusted_sources and src not in trusted_sources:
-                severity = "HIGH"
-                message = "UDP discovery traffic from untrusted source"
+    def run_pcap(self, path):
+        for pkt in rdpcap(path):
+            self.inspect(pkt)
 
-            alerts.append({
-                "timestamp": datetime.fromtimestamp(
-                    float(packet.time)
-                ).isoformat(timespec="seconds"),
-                "source_ip": src,
-                "destination_ip": dst,
-                "source_port": udp.sport,
-                "destination_port": udp.dport,
-                "protocol": "UDP",
-                "payload_length": len(payload),
-                "severity": severity,
-                "alert": message,
-                "payload": payload[:200].decode(
-                    "utf-8", errors="replace"
-                )
-            })
+    def run_live(self, iface, count=0, timeout=None):
+        sniff(iface=iface, prn=self.inspect, store=False, count=count, timeout=timeout)
 
-        elif packet.haslayer(TCP) and packet[TCP].dport == 631:
-            tcp = packet[TCP]
+    def export_csv(self, path):
+        fields = ["timestamp","severity","rule","proto","src","dst","sport","dport","detail"]
+        with open(path, "w", newline="") as f:
+            w = csv.DictWriter(f, fieldnames=fields)
+            w.writeheader(); w.writerows(self.alerts)
 
-            alerts.append({
-                "timestamp": datetime.fromtimestamp(
-                    float(packet.time)
-                ).isoformat(timespec="seconds"),
-                "source_ip": src,
-                "destination_ip": dst,
-                "source_port": tcp.sport,
-                "destination_port": tcp.dport,
-                "protocol": "TCP",
-                "payload_length": len(
-                    bytes(packet[Raw].load)
-                ) if packet.haslayer(Raw) else 0,
-                "severity": "REVIEW",
-                "alert": "TCP connection to CUPS IPP port 631",
-                "payload": ""
-            })
+    def export_json(self, path):
+        with open(path, "w") as f:
+            json.dump({"total_packets": self.total,
+                       "alert_count": len(self.alerts),
+                       "alerts": self.alerts}, f, indent=2)
 
-    # Report repeated UDP discovery traffic.
-    for source, count in source_counts.items():
-        if count >= 3:
-            alerts.append({
-                "timestamp": datetime.now().isoformat(
-                    timespec="seconds"
-                ),
-                "source_ip": source,
-                "destination_ip": "multiple",
-                "source_port": "",
-                "destination_port": 631,
-                "protocol": "UDP",
-                "payload_length": "",
-                "severity": "MEDIUM",
-                "alert": f"Repeated UDP port 631 traffic: {count} packets",
-                "payload": ""
-            })
-
-    return alerts
+    def summary(self):
+        by_sev = defaultdict(int)
+        for a in self.alerts:
+            by_sev[a["severity"]] += 1
+        print(f"[+] Packets analysed : {self.total}")
+        print(f"[+] Alerts generated : {len(self.alerts)}")
+        for sev in ("HIGH", "MEDIUM", "INFO"):
+            if by_sev[sev]:
+                print(f"      {sev:<7}: {by_sev[sev]}")
 
 
 def main():
-    parser = argparse.ArgumentParser(
-        description="CUPS printer discovery detector"
-    )
+    ap = argparse.ArgumentParser(description="CUPS printer-discovery traffic detector")
+    g = ap.add_mutually_exclusive_group(required=True)
+    g.add_argument("--pcap", help="offline PCAP file to analyse")
+    g.add_argument("--iface", help="interface for live capture (e.g. eth0)")
+    ap.add_argument("--trusted", default="172.19.0.3",
+                    help="comma-separated trusted source IPs (default: virtual printer)")
+    ap.add_argument("--port", type=int, default=CUPS_PORT)
+    ap.add_argument("--repeat-threshold", type=int, default=3)
+    ap.add_argument("--count", type=int, default=0, help="live: stop after N packets")
+    ap.add_argument("--timeout", type=int, default=None, help="live: stop after N seconds")
+    ap.add_argument("--csv", help="write alerts to CSV")
+    ap.add_argument("--json", help="write alerts to JSON")
+    args = ap.parse_args()
 
-    parser.add_argument("--pcap", required=True)
-    parser.add_argument("--output", default="detector_results")
-    parser.add_argument(
-        "--trusted",
-        default="",
-        help="Comma-separated trusted source IP addresses"
-    )
+    trusted = [x.strip() for x in args.trusted.split(",") if x.strip()]
+    det = Detector(trusted, port=args.port, repeat_threshold=args.repeat_threshold)
 
-    args = parser.parse_args()
+    if args.pcap:
+        print(f"[+] Offline analysis: {args.pcap}")
+        det.run_pcap(args.pcap)
+    else:
+        print(f"[+] Live capture on {args.iface} (Ctrl+C to stop)")
+        det.run_live(args.iface, count=args.count, timeout=args.timeout)
 
-    if not os.path.isfile(args.pcap):
-        print(f"[-] PCAP file not found: {args.pcap}")
-        return
-
-    trusted_sources = {
-        ip.strip()
-        for ip in args.trusted.split(",")
-        if ip.strip()
-    }
-
-    packets = rdpcap(args.pcap)
-
-    print(f"[+] Analysing {len(packets)} packets...")
-
-    alerts = analyse_packets(packets, trusted_sources)
-
-    os.makedirs(args.output, exist_ok=True)
-
-    json_path = os.path.join(args.output, "alerts.json")
-    csv_path = os.path.join(args.output, "alerts.csv")
-
-    with open(json_path, "w", encoding="utf-8") as file:
-        json.dump(alerts, file, indent=4)
-
-    with open(csv_path, "w", newline="", encoding="utf-8") as file:
-        fields = [
-            "timestamp", "source_ip", "destination_ip",
-            "source_port", "destination_port", "protocol",
-            "payload_length", "severity", "alert", "payload"
-        ]
-
-        writer = csv.DictWriter(file, fieldnames=fields)
-        writer.writeheader()
-        writer.writerows(alerts)
-
-    print("\n[+] Analysis complete")
-    print(f"[+] Packets analysed: {len(packets)}")
-    print(f"[+] Alerts generated: {len(alerts)}")
-
-    for alert in alerts:
-        print(
-            f"[{alert['severity']}] "
-            f"{alert['source_ip']} -> "
-            f"{alert['destination_ip']}:{alert['destination_port']} "
-            f"| {alert['alert']}"
-        )
-
-    print(f"\n[+] JSON report: {json_path}")
-    print(f"[+] CSV report: {csv_path}")
+    det.summary()
+    if args.csv:
+        det.export_csv(args.csv);  print(f"[+] CSV  written: {args.csv}")
+    if args.json:
+        det.export_json(args.json); print(f"[+] JSON written: {args.json}")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,3 @@
+timestamp,severity,rule,proto,src,dst,sport,dport,detail
+2026-11-16T16:19:28,HIGH,R1-untrusted-source,UDP,10.0.2.15,10.0.2.2,53,631,UDP/631 from untrusted source 10.0.2.15
+2026-11-16T16:19:28,HIGH,R2-malformed,UDP,10.0.2.15,10.0.2.2,53,631,Payload is not a valid legacy CUPS browse packet

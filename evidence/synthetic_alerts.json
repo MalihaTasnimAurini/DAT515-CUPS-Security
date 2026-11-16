@@ -1,0 +1,116 @@
+{
+  "total_packets": 8,
+  "alert_count": 10,
+  "alerts": [
+    {
+      "timestamp": "2026-11-16T16:21:08",
+      "severity": "HIGH",
+      "rule": "R1-untrusted-source",
+      "proto": "UDP",
+      "src": "192.0.2.50",
+      "dst": "172.19.0.2",
+      "sport": 40001,
+      "dport": 631,
+      "detail": "UDP/631 from untrusted source 192.0.2.50"
+    },
+    {
+      "timestamp": "2026-11-16T16:21:08",
+      "severity": "HIGH",
+      "rule": "R1-untrusted-source",
+      "proto": "UDP",
+      "src": "192.0.2.50",
+      "dst": "172.19.0.2",
+      "sport": 40002,
+      "dport": 631,
+      "detail": "UDP/631 from untrusted source 192.0.2.50"
+    },
+    {
+      "timestamp": "2026-11-16T16:21:08",
+      "severity": "HIGH",
+      "rule": "R2-malformed",
+      "proto": "UDP",
+      "src": "192.0.2.50",
+      "dst": "172.19.0.2",
+      "sport": 40002,
+      "dport": 631,
+      "detail": "Payload is not a valid legacy CUPS browse packet"
+    },
+    {
+      "timestamp": "2026-11-16T16:21:08",
+      "severity": "HIGH",
+      "rule": "R1-untrusted-source",
+      "proto": "UDP",
+      "src": "192.0.2.50",
+      "dst": "172.19.0.2",
+      "sport": 40003,
+      "dport": 631,
+      "detail": "UDP/631 from untrusted source 192.0.2.50"
+    },
+    {
+      "timestamp": "2026-11-16T16:21:08",
+      "severity": "HIGH",
+      "rule": "R2-malformed",
+      "proto": "UDP",
+      "src": "192.0.2.50",
+      "dst": "172.19.0.2",
+      "sport": 40003,
+      "dport": 631,
+      "detail": "Payload is not a valid legacy CUPS browse packet"
+    },
+    {
+      "timestamp": "2026-11-16T16:21:08",
+      "severity": "MEDIUM",
+      "rule": "R3-repeated",
+      "proto": "UDP",
+      "src": "192.0.2.50",
+      "dst": "172.19.0.2",
+      "sport": 40003,
+      "dport": 631,
+      "detail": "Repeated UDP/631 from 192.0.2.50 (>= 3)"
+    },
+    {
+      "timestamp": "2026-11-16T16:21:08",
+      "severity": "HIGH",
+      "rule": "R1-untrusted-source",
+      "proto": "UDP",
+      "src": "192.0.2.50",
+      "dst": "172.19.0.2",
+      "sport": 41000,
+      "dport": 631,
+      "detail": "UDP/631 from untrusted source 192.0.2.50"
+    },
+    {
+      "timestamp": "2026-11-16T16:21:08",
+      "severity": "HIGH",
+      "rule": "R1-untrusted-source",
+      "proto": "UDP",
+      "src": "192.0.2.50",
+      "dst": "172.19.0.2",
+      "sport": 41001,
+      "dport": 631,
+      "detail": "UDP/631 from untrusted source 192.0.2.50"
+    },
+    {
+      "timestamp": "2026-11-16T16:21:08",
+      "severity": "HIGH",
+      "rule": "R1-untrusted-source",
+      "proto": "UDP",
+      "src": "192.0.2.50",
+      "dst": "172.19.0.2",
+      "sport": 41002,
+      "dport": 631,
+      "detail": "UDP/631 from untrusted source 192.0.2.50"
+    },
+    {
+      "timestamp": "2026-11-16T16:21:08",
+      "severity": "INFO",
+      "rule": "R4-tcp-review",
+      "proto": "TCP",
+      "src": "192.0.2.50",
+      "dst": "172.19.0.2",
+      "sport": 50000,
+      "dport": 631,
+      "detail": "TCP/631 connection (review)"
+    }
+  ]
+}

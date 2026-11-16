@@ -1,0 +1,11 @@
+timestamp,severity,rule,proto,src,dst,sport,dport,detail
+2026-11-16T16:21:08,HIGH,R1-untrusted-source,UDP,192.0.2.50,172.19.0.2,40001,631,UDP/631 from untrusted source 192.0.2.50
+2026-11-16T16:21:08,HIGH,R1-untrusted-source,UDP,192.0.2.50,172.19.0.2,40002,631,UDP/631 from untrusted source 192.0.2.50
+2026-11-16T16:21:08,HIGH,R2-malformed,UDP,192.0.2.50,172.19.0.2,40002,631,Payload is not a valid legacy CUPS browse packet
+2026-11-16T16:21:08,HIGH,R1-untrusted-source,UDP,192.0.2.50,172.19.0.2,40003,631,UDP/631 from untrusted source 192.0.2.50
+2026-11-16T16:21:08,HIGH,R2-malformed,UDP,192.0.2.50,172.19.0.2,40003,631,Payload is not a valid legacy CUPS browse packet
+2026-11-16T16:21:08,MEDIUM,R3-repeated,UDP,192.0.2.50,172.19.0.2,40003,631,Repeated UDP/631 from 192.0.2.50 (>= 3)
+2026-11-16T16:21:08,HIGH,R1-untrusted-source,UDP,192.0.2.50,172.19.0.2,41000,631,UDP/631 from untrusted source 192.0.2.50
+2026-11-16T16:21:08,HIGH,R1-untrusted-source,UDP,192.0.2.50,172.19.0.2,41001,631,UDP/631 from untrusted source 192.0.2.50
+2026-11-16T16:21:08,HIGH,R1-untrusted-source,UDP,192.0.2.50,172.19.0.2,41002,631,UDP/631 from untrusted source 192.0.2.50
+2026-11-16T16:21:08,INFO,R4-tcp-review,TCP,192.0.2.50,172.19.0.2,50000,631,TCP/631 connection (review)
