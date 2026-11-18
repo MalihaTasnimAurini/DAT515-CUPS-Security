@@ -130,7 +130,7 @@ def main():
     g = ap.add_mutually_exclusive_group(required=True)
     g.add_argument("--pcap", help="offline PCAP file to analyse")
     g.add_argument("--iface", help="interface for live capture (e.g. eth0)")
-    ap.add_argument("--trusted", default="172.19.0.3",
+    ap.add_argument("--trusted", default="172.18.0.1",
                     help="comma-separated trusted source IPs (default: virtual printer)")
     ap.add_argument("--port", type=int, default=CUPS_PORT)
     ap.add_argument("--repeat-threshold", type=int, default=3)
