@@ -24,9 +24,10 @@ All testing must be performed only in an isolated environment that you own or ar
 | `requirements.txt` | Python dependencies. |
 | `pcap_files/` | Selected input and experiment packet captures. |
 | `detector_results/` | Selected detector outputs in CSV and JSON formats. |
-| `evidence/` | Screenshots organised by assignment task. |
+| `evidence/` | Screenshots (numbered in experiment order), browse-processing logs and supplementary alert outputs. |
+| `archive/` | Earlier, partially completed implementation kept for reference. Not part of the final implementation (see Section 13). |
 
-Older files such as `cups_attack_lab.py`, `cups_detector_lab.py`, and `cups_detector_v1.py` are earlier iterations. The experiments documented in the current report use **`cups_attack.py` and `cups_detector.py`**. Do not use the older `_lab.py` files as the final implementation unless the submitted report is changed to match them.
+An earlier, partially completed implementation (`cups_attack_lab.py`, `cups_detector_lab.py`, `cups_detector_v1.py`) and its outputs are kept in `archive/` for reference only (see Section 13). The experiments documented in the current report use **`cups_attack.py` and `cups_detector.py`**.
 
 ## 3. Laboratory environment
 
@@ -80,7 +81,7 @@ Some packet-capture and packet-transmission operations require elevated privileg
 
 ## 5. Attack tool: `cups_attack.py`
 
-The sender constructs three controlled UDP/631 browse-style test advertisements. The recorded test cases vary printer/queue information and the advertised URI. The tool writes a PCAP file and logs its activity.
+The sender constructs three controlled UDP/631 browse-style test advertisements. The recorded test cases vary printer/queue information and the advertised URI. The tool writes a PCAP file and logs its activity to `cups_attack.log` in the current working directory.
 
 Show command-line options:
 
@@ -172,6 +173,8 @@ sudo python3 cups_detector.py \
   --json detector_results/live_results.json
 ```
 
+The example writes new files; the recorded live run is saved as `detector_results/task3_live_results.csv` and `.json`.
+
 The live capture observes traffic visible on the selected interface. The total packet count can include unrelated bridge traffic, not only the test packets.
 
 ## 7. Detection rules
@@ -242,39 +245,56 @@ The recorded checks do not constitute a complete end-to-end IPP printing test af
 - Monitor unexpected printer-discovery traffic.
 - Segment printer services from untrusted networks.
 
-## 12. Suggested submission contents
-
-Include only the current implementation and the files needed to reproduce the experiments:
+## 12. Repository structure
 
 ```text
-cups-security-lab-submission/
-├── cups_attack.py
-├── cups_detector.py
-├── README.md
-├── requirements.txt
-├── pcap_files/
+DAT515-CUPS-Security/
+├── README.md                  # This file
+├── requirements.txt           # Python dependencies
+├── cups_attack.py             # Final packet-generation tool
+├── cups_detector.py           # Final detector (offline PCAP and live capture)
+├── pcap_files/                # Input and experiment packet captures
+│   ├── normal_discovery.pcap
+│   ├── normal_tcp631.pcap
 │   ├── crafted_browse_tests.pcap
 │   ├── malformed_test.pcap
 │   ├── untrusted_valid_browse.pcap
-│   └── r5_lab_marker.pcap
-├── detector_results/
-│   ├── task3_crafted_results.csv
-│   ├── task4_normal_discovery.csv
-│   ├── task4_normal_tcp631.csv
-│   ├── task4_authorised_browse.csv
-│   ├── task4_untrusted_malformed.csv
-│   ├── task4_untrusted_valid.csv
-│   ├── task4_r5_marker.csv
-│   └── task5_post_mitigation.csv
-└── evidence/
-    ├── task1_environment/
-    ├── task2_attack/
-    ├── task3_detection/
-    ├── task4_experiments/
-    └── task5_mitigation/
+│   ├── r5_lab_marker.pcap
+│   ├── post_mitigation_delivery.pcap
+│   └── ...                    # Baseline and supporting captures
+├── detector_results/          # Detector outputs (CSV and JSON) for Tasks 3–5
+│   ├── task3_*_results.csv/.json
+│   ├── task4_*.csv/.json
+│   └── task5_post_mitigation.csv/.json
+├── evidence/
+│   ├── screenshots/           # Numbered experiment screenshots
+│   │   └── Report_screenshots/  # Figures used in the report
+│   ├── 07_browse_processing.log
+│   ├── 08_live_variation_processing.log
+│   └── *_alerts.csv/.json     # Supplementary detector outputs
+├── report/                    # Final assignment report
+└── archive/                   # Earlier, partially completed implementation (see Section 13)
 ```
 
-Do not include the Python virtual environment (`venv/`), `__pycache__/`, Docker image layers, credentials, private keys, or unrelated temporary files. Confirm the assignment instructions before deciding whether to submit PCAPs and screenshots separately or inside the archive.
+The experiment scenarios in Section 8 use the captures listed under `pcap_files/` and the matching files in `detector_results/`.
+
+## 13. Archive: earlier implementation
+
+The `archive/` folder contains an earlier version of this project. It was a partial implementation, put together to meet the original assignment deadline. After that deadline, the project was restructured and the attack tool and detector were reimplemented as `cups_attack.py` and `cups_detector.py`. Compared with the earlier scripts, the new implementation adds source-address and dry-run options to the attack tool, a numbered R1–R5 rule set with a configurable repeat threshold in the detector, and one consistent CSV/JSON output format. All experiments documented in this README were run with the new implementation.
+
+The archived files are kept for transparency, so that the development history of the project remains visible. They are not used in the final experiments, and their outputs use an older format that does not match the current detector.
+
+| Archived item | What it was |
+|---|---|
+| `archive/scripts/cups_attack_lab.py` | Earlier packet-generation script |
+| `archive/scripts/cups_detector_lab.py`, `cups_detector_v1.py` | Earlier detector versions |
+| `archive/scripts/generate_test_pcap.py`, `make_test_traffic.py` | Earlier test-traffic generators |
+| `archive/scripts/README_QUICKSTART.md` | Quick-start guide for the earlier scripts |
+| `archive/detector_results/`, `archive/evidence/detector-results/` | Outputs from the earlier detectors (older CSV/JSON format) |
+| `archive/captures/`, `archive/evidence/pcaps/` | Duplicate copies of captures that are also in `pcap_files/` |
+| `archive/logs/` | Log written by the earlier packet-generation script |
+
+The earlier scripts use different command-line options and addresses from those in this README. To reproduce the results, use the current files described in Sections 5 and 6.
 
 ## Author
 
