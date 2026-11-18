@@ -21,6 +21,7 @@ All testing must be performed only in an isolated environment that you own or ar
 |---|---|
 | `cups_attack.py` | Current Scapy packet-generation tool. Supports target/source/port options, dry-run mode, logging, and PCAP output. |
 | `cups_detector.py` | Current detector. Supports offline PCAP analysis, live capture, trusted-source configuration, and CSV/JSON exports. |
+| `generate_test_pcap.py` | Generates `pcap_files/malformed_test.pcap` (three malformed advertisements from an untrusted source) for offline detector testing. Writes a PCAP only; it does not transmit packets. |
 | `requirements.txt` | Python dependencies. |
 | `pcap_files/` | Selected input and experiment packet captures. |
 | `detector_results/` | Selected detector outputs in CSV and JSON formats. |
@@ -116,7 +117,17 @@ Verify the saved capture:
 sudo tcpdump -nn -r pcap_files/crafted_browse_tests.pcap
 ```
 
-The recorded bridge capture confirmed that three UDP datagrams were delivered to `172.18.0.2:631`. CUPS processed the advertisements, but the printer queue was **not** successfully created: the advertised `/printers/<queue>` URI did not match the virtual IPP service endpoint `/ipp/print`. Therefore, the demonstrated result is packet construction, transmission, capture, and browse processing—not successful end-to-end printer installation.
+The recorded bridge capture confirmed that three UDP datagrams were delivered to `172.18.0.2:631`. The victim log (`evidence/08_live_variation_processing.log`) shows that `cups-browsed` accepted the unauthenticated advertisement and initiated its own connection to the advertised printer:
+
+- it reported `Found CUPS queue/class: LabPrinter on host 172.18.0.1`;
+- the advertisement passed the `BrowseFilter` checks;
+- it sent an IPP Get-Printer-Attributes request to `ipp://172.18.0.1:8631/printers/LabPrinter`.
+
+This victim-initiated connection to an attacker-chosen endpoint is the network-facing weakness described by CVE-2024-47176. The local print queue was **not** created: the advertised `/printers/<queue>` path did not match the virtual IPP service endpoint `/ipp/print`, so the request returned "not found" and the log records `Unable to create print queue`. The demonstrated result is therefore victim-initiated communication, not successful printer installation or code execution.
+
+A separate manual control test advertised the `/ipp/print` path directly. `cups-browsed` rejected it (`Don't understand URI`, see `evidence/07_browse_processing.log`), confirming that the accepted browse form is `/printers/<name>`. This control test was not produced by `cups_attack.py`.
+
+**Note on addresses:** `--source` sets only the IP source address. The printer URI inside each advertisement is fixed in the script as `ipp://172.18.0.1:8631/printers/...`. If the Docker gateway address changes, edit the `tests` list in `cups_attack.py` so that the URI points to the current virtual printer.
 
 ## 6. Detector: `cups_detector.py`
 
@@ -128,7 +139,20 @@ Show command-line options:
 python3 cups_detector.py --help
 ```
 
-### 6.1 Offline PCAP analysis
+### 6.1 Test captures
+
+| Capture | Contents | How it was created |
+|---|---|---|
+| `crafted_browse_tests.pcap` | 3 valid-format advertisements from the trusted source `172.18.0.1`, source ports 40000–40002 | `cups_attack.py` |
+| `malformed_test.pcap` | 3 non-browse payloads (`UNRECOGNISED-PRINTER-TEST-1..3`) from untrusted `192.0.2.50`, source ports 41000–41002 | `generate_test_pcap.py` |
+| `untrusted_valid_browse.pcap` | 3 valid-format advertisements from untrusted `192.0.2.50`, source ports 42000–42002 | Created separately with Scapy during the lab session (no generator script is included) |
+| `r5_lab_marker.pcap` | 1 packet containing the `LAB-TEST` marker from `192.0.2.60`, source port 43000 | Created separately with Scapy during the lab session (no generator script is included) |
+| `normal_discovery.pcap`, `normal_tcp631.pcap` | Captured normal mDNS and TCP/631 traffic | Captured with `tcpdump` |
+| `post_mitigation_delivery.pcap` | Replay of the 3 crafted advertisements after mitigation | Captured on the Docker bridge |
+
+The R5 marker packet comes from an untrusted address but produces only the R5 notice, because R5 is evaluated first and stops further UDP rule checks for that packet.
+
+### 6.2 Offline PCAP analysis
 
 Example: analyse the crafted advertisements and trust the lab source `172.18.0.1`:
 
@@ -160,7 +184,7 @@ sudo python3 cups_detector.py \
   --json detector_results/task4_r5_marker.json
 ```
 
-### 6.2 Live capture
+### 6.3 Live capture
 
 Use the current Docker bridge interface (check it with `ip -br link`):
 
@@ -173,7 +197,7 @@ sudo python3 cups_detector.py \
   --json detector_results/live_results.json
 ```
 
-The example writes new files; the recorded live run is saved as `detector_results/task3_live_results.csv` and `.json`.
+The example writes new files; the recorded live run (87 packets analysed, one R3 MEDIUM alert) is saved as `detector_results/task3_live_results.csv` and `.json`.
 
 The live capture observes traffic visible on the selected interface. The total packet count can include unrelated bridge traffic, not only the test packets.
 
@@ -201,6 +225,7 @@ The current report uses the following test scenarios:
 | Untrusted malformed advertisements | `malformed_test.pcap` / `task4_untrusted_malformed.csv` | 3 packets; 6 HIGH alerts from R1/R2 and 1 MEDIUM R3 alert. |
 | Untrusted valid-format advertisements | `untrusted_valid_browse.pcap` / `task4_untrusted_valid.csv` | 3 packets; 3 HIGH R1 alerts and 1 MEDIUM R3 alert. |
 | R5 marker test | `r5_lab_marker.pcap` / `task4_r5_marker.csv` | 1 packet; 1 INFO R5 alert. |
+| Live bridge capture | live capture on `br-e286751a311b` / `task3_live_results.csv` | 87 packets analysed; 1 MEDIUM R3 alert. |
 | Post-mitigation replay | `post_mitigation_delivery.pcap` / `task5_post_mitigation.csv` | 3 packets captured; 1 MEDIUM R3 alert. |
 
 Alert totals count rule activations, not unique packets. A packet can trigger more than one rule. R4 INFO notices are review signals and are not classified as malicious detections.
@@ -228,7 +253,9 @@ The recorded checks do not constitute a complete end-to-end IPP printing test af
 ## 10. Known limitations
 
 - The project uses a controlled lab and a small number of packets; results should not be generalised to production networks.
-- The crafted advertisements were transmitted and observed, but successful queue creation was not achieved.
+- The victim initiated an IPP connection to the advertised printer, but no print queue was created because the advertised path did not match the virtual printer's `/ipp/print` endpoint.
+- The advertisements varied only the queue name in the URI path; the advertised printer address and port were not varied.
+- The detector does not monitor the virtual printer's TCP/8631 endpoint, so the victim-initiated IPP connection itself is not detected.
 - The detector uses simplified payload validation rather than a complete CUPS browse protocol parser.
 - R3 can flag legitimate repeated advertisements from trusted sources.
 - R4 is informational and should not be treated as a malicious-activity verdict.
@@ -253,6 +280,7 @@ DAT515-CUPS-Security/
 ├── requirements.txt           # Python dependencies
 ├── cups_attack.py             # Final packet-generation tool
 ├── cups_detector.py           # Final detector (offline PCAP and live capture)
+├── generate_test_pcap.py      # Generates malformed_test.pcap for offline testing
 ├── pcap_files/                # Input and experiment packet captures
 │   ├── normal_discovery.pcap
 │   ├── normal_tcp631.pcap
@@ -267,10 +295,10 @@ DAT515-CUPS-Security/
 │   ├── task4_*.csv/.json
 │   └── task5_post_mitigation.csv/.json
 ├── evidence/
+│   ├── 07_browse_processing.log          # Victim log: /ipp/print control test
+│   ├── 08_live_variation_processing.log  # Victim log: accepted advertisement and IPP request
 │   ├── screenshots/           # Numbered experiment screenshots
 │   │   └── Report_screenshots/  # Figures used in the report
-│   ├── 07_browse_processing.log
-│   ├── 08_live_variation_processing.log
 │   └── *_alerts.csv/.json     # Supplementary detector outputs
 ├── report/                    # Final assignment report
 └── archive/                   # Earlier, partially completed implementation (see Section 13)
@@ -288,7 +316,7 @@ The archived files are kept for transparency, so that the development history of
 |---|---|
 | `archive/scripts/cups_attack_lab.py` | Earlier packet-generation script |
 | `archive/scripts/cups_detector_lab.py`, `cups_detector_v1.py` | Earlier detector versions |
-| `archive/scripts/generate_test_pcap.py`, `make_test_traffic.py` | Earlier test-traffic generators |
+| `archive/scripts/make_test_traffic.py` | Earlier synthetic test-traffic generator (older 172.19.0.x addresses) |
 | `archive/scripts/README_QUICKSTART.md` | Quick-start guide for the earlier scripts |
 | `archive/detector_results/`, `archive/evidence/detector-results/` | Outputs from the earlier detectors (older CSV/JSON format) |
 | `archive/captures/`, `archive/evidence/pcaps/` | Duplicate copies of captures that are also in `pcap_files/` |
