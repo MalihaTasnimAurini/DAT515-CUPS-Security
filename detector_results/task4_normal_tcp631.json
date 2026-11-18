@@ -1,0 +1,138 @@
+{
+  "total_packets": 21,
+  "alert_count": 12,
+  "alerts": [
+    {
+      "timestamp": "2026-11-17T21:11:33",
+      "severity": "INFO",
+      "rule": "R4-tcp-review",
+      "proto": "TCP",
+      "src": "127.0.0.1",
+      "dst": "127.0.0.1",
+      "sport": 49566,
+      "dport": 631,
+      "detail": "TCP/631 connection (review)"
+    },
+    {
+      "timestamp": "2026-11-17T21:11:33",
+      "severity": "INFO",
+      "rule": "R4-tcp-review",
+      "proto": "TCP",
+      "src": "127.0.0.1",
+      "dst": "127.0.0.1",
+      "sport": 49566,
+      "dport": 631,
+      "detail": "TCP/631 connection (review)"
+    },
+    {
+      "timestamp": "2026-11-17T21:11:33",
+      "severity": "INFO",
+      "rule": "R4-tcp-review",
+      "proto": "TCP",
+      "src": "127.0.0.1",
+      "dst": "127.0.0.1",
+      "sport": 49566,
+      "dport": 631,
+      "detail": "TCP/631 connection (review)"
+    },
+    {
+      "timestamp": "2026-11-17T21:11:33",
+      "severity": "INFO",
+      "rule": "R4-tcp-review",
+      "proto": "TCP",
+      "src": "172.19.0.1",
+      "dst": "172.19.0.2",
+      "sport": 49216,
+      "dport": 631,
+      "detail": "TCP/631 connection (review)"
+    },
+    {
+      "timestamp": "2026-11-17T21:11:33",
+      "severity": "INFO",
+      "rule": "R4-tcp-review",
+      "proto": "TCP",
+      "src": "172.19.0.1",
+      "dst": "172.19.0.2",
+      "sport": 49216,
+      "dport": 631,
+      "detail": "TCP/631 connection (review)"
+    },
+    {
+      "timestamp": "2026-11-17T21:11:33",
+      "severity": "INFO",
+      "rule": "R4-tcp-review",
+      "proto": "TCP",
+      "src": "172.19.0.1",
+      "dst": "172.19.0.2",
+      "sport": 49216,
+      "dport": 631,
+      "detail": "TCP/631 connection (review)"
+    },
+    {
+      "timestamp": "2026-11-17T21:11:33",
+      "severity": "INFO",
+      "rule": "R4-tcp-review",
+      "proto": "TCP",
+      "src": "172.19.0.1",
+      "dst": "172.19.0.2",
+      "sport": 49216,
+      "dport": 631,
+      "detail": "TCP/631 connection (review)"
+    },
+    {
+      "timestamp": "2026-11-17T21:11:33",
+      "severity": "INFO",
+      "rule": "R4-tcp-review",
+      "proto": "TCP",
+      "src": "172.19.0.1",
+      "dst": "172.19.0.2",
+      "sport": 49216,
+      "dport": 631,
+      "detail": "TCP/631 connection (review)"
+    },
+    {
+      "timestamp": "2026-11-17T21:11:33",
+      "severity": "INFO",
+      "rule": "R4-tcp-review",
+      "proto": "TCP",
+      "src": "172.19.0.1",
+      "dst": "172.19.0.2",
+      "sport": 49216,
+      "dport": 631,
+      "detail": "TCP/631 connection (review)"
+    },
+    {
+      "timestamp": "2026-11-17T21:11:33",
+      "severity": "INFO",
+      "rule": "R4-tcp-review",
+      "proto": "TCP",
+      "src": "172.19.0.1",
+      "dst": "172.19.0.2",
+      "sport": 49216,
+      "dport": 631,
+      "detail": "TCP/631 connection (review)"
+    },
+    {
+      "timestamp": "2026-11-17T21:11:33",
+      "severity": "INFO",
+      "rule": "R4-tcp-review",
+      "proto": "TCP",
+      "src": "172.19.0.1",
+      "dst": "172.19.0.2",
+      "sport": 49216,
+      "dport": 631,
+      "detail": "TCP/631 connection (review)"
+    },
+    {
+      "timestamp": "2026-11-17T21:11:33",
+      "severity": "INFO",
+      "rule": "R4-tcp-review",
+      "proto": "TCP",
+      "src": "127.0.0.1",
+      "dst": "127.0.0.1",
+      "sport": 49566,
+      "dport": 631,
+      "detail": "TCP/631 connection (review)"
+    }
+  ]
+}

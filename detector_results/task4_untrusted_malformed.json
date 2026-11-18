@@ -1,0 +1,83 @@
+{
+  "total_packets": 3,
+  "alert_count": 7,
+  "alerts": [
+    {
+      "timestamp": "2026-11-17T21:12:55",
+      "severity": "HIGH",
+      "rule": "R1-untrusted-source",
+      "proto": "UDP",
+      "src": "192.0.2.50",
+      "dst": "172.18.0.2",
+      "sport": 41000,
+      "dport": 631,
+      "detail": "UDP/631 from untrusted source 192.0.2.50"
+    },
+    {
+      "timestamp": "2026-11-17T21:12:55",
+      "severity": "HIGH",
+      "rule": "R2-malformed",
+      "proto": "UDP",
+      "src": "192.0.2.50",
+      "dst": "172.18.0.2",
+      "sport": 41000,
+      "dport": 631,
+      "detail": "Payload is not a valid legacy CUPS browse packet"
+    },
+    {
+      "timestamp": "2026-11-17T21:12:55",
+      "severity": "HIGH",
+      "rule": "R1-untrusted-source",
+      "proto": "UDP",
+      "src": "192.0.2.50",
+      "dst": "172.18.0.2",
+      "sport": 41001,
+      "dport": 631,
+      "detail": "UDP/631 from untrusted source 192.0.2.50"
+    },
+    {
+      "timestamp": "2026-11-17T21:12:55",
+      "severity": "HIGH",
+      "rule": "R2-malformed",
+      "proto": "UDP",
+      "src": "192.0.2.50",
+      "dst": "172.18.0.2",
+      "sport": 41001,
+      "dport": 631,
+      "detail": "Payload is not a valid legacy CUPS browse packet"
+    },
+    {
+      "timestamp": "2026-11-17T21:12:55",
+      "severity": "HIGH",
+      "rule": "R1-untrusted-source",
+      "proto": "UDP",
+      "src": "192.0.2.50",
+      "dst": "172.18.0.2",
+      "sport": 41002,
+      "dport": 631,
+      "detail": "UDP/631 from untrusted source 192.0.2.50"
+    },
+    {
+      "timestamp": "2026-11-17T21:12:55",
+      "severity": "HIGH",
+      "rule": "R2-malformed",
+      "proto": "UDP",
+      "src": "192.0.2.50",
+      "dst": "172.18.0.2",
+      "sport": 41002,
+      "dport": 631,
+      "detail": "Payload is not a valid legacy CUPS browse packet"
+    },
+    {
+      "timestamp": "2026-11-17T21:12:55",
+      "severity": "MEDIUM",
+      "rule": "R3-repeated",
+      "proto": "UDP",
+      "src": "192.0.2.50",
+      "dst": "172.18.0.2",
+      "sport": 41002,
+      "dport": 631,
+      "detail": "Repeated UDP/631 from 192.0.2.50 (>= 3)"
+    }
+  ]
+}

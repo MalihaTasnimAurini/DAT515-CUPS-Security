@@ -1,0 +1,2 @@
+timestamp,severity,rule,proto,src,dst,sport,dport,detail
+2026-11-17T21:37:51,INFO,R5-lab-test,UDP,192.0.2.60,172.18.0.2,43000,631,Recognised lab connectivity-test payload

@@ -1,0 +1,13 @@
+timestamp,severity,rule,proto,src,dst,sport,dport,detail
+2026-11-17T21:11:33,INFO,R4-tcp-review,TCP,127.0.0.1,127.0.0.1,49566,631,TCP/631 connection (review)
+2026-11-17T21:11:33,INFO,R4-tcp-review,TCP,127.0.0.1,127.0.0.1,49566,631,TCP/631 connection (review)
+2026-11-17T21:11:33,INFO,R4-tcp-review,TCP,127.0.0.1,127.0.0.1,49566,631,TCP/631 connection (review)
+2026-11-17T21:11:33,INFO,R4-tcp-review,TCP,172.19.0.1,172.19.0.2,49216,631,TCP/631 connection (review)
+2026-11-17T21:11:33,INFO,R4-tcp-review,TCP,172.19.0.1,172.19.0.2,49216,631,TCP/631 connection (review)
+2026-11-17T21:11:33,INFO,R4-tcp-review,TCP,172.19.0.1,172.19.0.2,49216,631,TCP/631 connection (review)
+2026-11-17T21:11:33,INFO,R4-tcp-review,TCP,172.19.0.1,172.19.0.2,49216,631,TCP/631 connection (review)
+2026-11-17T21:11:33,INFO,R4-tcp-review,TCP,172.19.0.1,172.19.0.2,49216,631,TCP/631 connection (review)
+2026-11-17T21:11:33,INFO,R4-tcp-review,TCP,172.19.0.1,172.19.0.2,49216,631,TCP/631 connection (review)
+2026-11-17T21:11:33,INFO,R4-tcp-review,TCP,172.19.0.1,172.19.0.2,49216,631,TCP/631 connection (review)
+2026-11-17T21:11:33,INFO,R4-tcp-review,TCP,172.19.0.1,172.19.0.2,49216,631,TCP/631 connection (review)
+2026-11-17T21:11:33,INFO,R4-tcp-review,TCP,127.0.0.1,127.0.0.1,49566,631,TCP/631 connection (review)

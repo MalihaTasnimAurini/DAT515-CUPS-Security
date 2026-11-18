@@ -1,0 +1,8 @@
+timestamp,severity,rule,proto,src,dst,sport,dport,detail
+2026-11-17T21:00:17,HIGH,R1-untrusted-source,UDP,192.0.2.50,172.18.0.2,41000,631,UDP/631 from untrusted source 192.0.2.50
+2026-11-17T21:00:17,HIGH,R2-malformed,UDP,192.0.2.50,172.18.0.2,41000,631,Payload is not a valid legacy CUPS browse packet
+2026-11-17T21:00:17,HIGH,R1-untrusted-source,UDP,192.0.2.50,172.18.0.2,41001,631,UDP/631 from untrusted source 192.0.2.50
+2026-11-17T21:00:17,HIGH,R2-malformed,UDP,192.0.2.50,172.18.0.2,41001,631,Payload is not a valid legacy CUPS browse packet
+2026-11-17T21:00:17,HIGH,R1-untrusted-source,UDP,192.0.2.50,172.18.0.2,41002,631,UDP/631 from untrusted source 192.0.2.50
+2026-11-17T21:00:17,HIGH,R2-malformed,UDP,192.0.2.50,172.18.0.2,41002,631,Payload is not a valid legacy CUPS browse packet
+2026-11-17T21:00:17,MEDIUM,R3-repeated,UDP,192.0.2.50,172.18.0.2,41002,631,Repeated UDP/631 from 192.0.2.50 (>= 3)

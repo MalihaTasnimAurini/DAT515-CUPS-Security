@@ -1,0 +1,50 @@
+{
+  "total_packets": 3,
+  "alert_count": 4,
+  "alerts": [
+    {
+      "timestamp": "2026-11-17T20:58:21",
+      "severity": "HIGH",
+      "rule": "R1-untrusted-source",
+      "proto": "UDP",
+      "src": "172.18.0.1",
+      "dst": "172.18.0.2",
+      "sport": 40000,
+      "dport": 631,
+      "detail": "UDP/631 from untrusted source 172.18.0.1"
+    },
+    {
+      "timestamp": "2026-11-17T20:58:21",
+      "severity": "HIGH",
+      "rule": "R1-untrusted-source",
+      "proto": "UDP",
+      "src": "172.18.0.1",
+      "dst": "172.18.0.2",
+      "sport": 40001,
+      "dport": 631,
+      "detail": "UDP/631 from untrusted source 172.18.0.1"
+    },
+    {
+      "timestamp": "2026-11-17T20:58:21",
+      "severity": "HIGH",
+      "rule": "R1-untrusted-source",
+      "proto": "UDP",
+      "src": "172.18.0.1",
+      "dst": "172.18.0.2",
+      "sport": 40002,
+      "dport": 631,
+      "detail": "UDP/631 from untrusted source 172.18.0.1"
+    },
+    {
+      "timestamp": "2026-11-17T20:58:21",
+      "severity": "MEDIUM",
+      "rule": "R3-repeated",
+      "proto": "UDP",
+      "src": "172.18.0.1",
+      "dst": "172.18.0.2",
+      "sport": 40002,
+      "dport": 631,
+      "detail": "Repeated UDP/631 from 172.18.0.1 (>= 3)"
+    }
+  ]
+}

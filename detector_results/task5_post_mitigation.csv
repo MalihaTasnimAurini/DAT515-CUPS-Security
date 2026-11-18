@@ -1,0 +1,2 @@
+timestamp,severity,rule,proto,src,dst,sport,dport,detail
+2026-11-17T21:32:19,MEDIUM,R3-repeated,UDP,172.18.0.1,172.18.0.2,40002,631,Repeated UDP/631 from 172.18.0.1 (>= 3)

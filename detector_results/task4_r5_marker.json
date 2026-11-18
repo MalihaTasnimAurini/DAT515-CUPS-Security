@@ -1,0 +1,17 @@
+{
+  "total_packets": 1,
+  "alert_count": 1,
+  "alerts": [
+    {
+      "timestamp": "2026-11-17T21:37:51",
+      "severity": "INFO",
+      "rule": "R5-lab-test",
+      "proto": "UDP",
+      "src": "192.0.2.60",
+      "dst": "172.18.0.2",
+      "sport": 43000,
+      "dport": 631,
+      "detail": "Recognised lab connectivity-test payload"
+    }
+  ]
+}

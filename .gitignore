@@ -4,3 +4,11 @@ __pycache__/
 .venv/
 venv/
 .DS_Store
+
+# Local lab environment and generated files
+vulhub/
+venv/
+__pycache__/
+*.pyc
+cups_attack.log
+=2.6.0
